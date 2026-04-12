@@ -6,14 +6,19 @@ public class VoxelWorld : MonoBehaviour
     [Header("Chunk Settings")]
     [SerializeField] private int chunkSize = 8;
     [SerializeField] private int chunksX = 2;
-    [SerializeField] private int chunksY = 1;
+    [SerializeField] private int chunksY = 8;
     [SerializeField] private int chunksZ = 2;
 
     [Header("Terrain Settings")]
-    [SerializeField] private float noiseScale = 0.15f;
-    [SerializeField] private float heightMultiplier = 5f;
-    [SerializeField] private int baseHeight = 2;
+    [SerializeField] private float terrainHeight = 50f;
+    [SerializeField] private float baseScale = 50f;
+    [SerializeField] private int octaves = 4;
+    [SerializeField] private float persistence = 0.35f;
+    [SerializeField] private float lacunarity = 3f;
     [SerializeField] private int seed = 0;
+    [SerializeField] private Vector2 offset;
+    [SerializeField] private float ridgeStrength = 1f;
+    [SerializeField] private float mountainCurve = 1f;
 
     private readonly Dictionary<Vector3Int, ChunkData> chunks = new();
 
@@ -27,9 +32,18 @@ public class VoxelWorld : MonoBehaviour
         chunksY = Mathf.Max(1, chunksY);
         chunksZ = Mathf.Max(1, chunksZ);
 
-        noiseScale = Mathf.Max(0.001f, noiseScale);
-        heightMultiplier = Mathf.Max(1f, heightMultiplier);
-        baseHeight = Mathf.Max(1, baseHeight);
+        terrainHeight = Mathf.Max(1f, chunkSize * chunksY);
+        baseScale = Mathf.Max(0.0001f, baseScale);
+        octaves = Mathf.Max(1, octaves);
+        persistence = Mathf.Max(0f, persistence);
+        lacunarity = Mathf.Max(0.0001f, lacunarity);
+        ridgeStrength = Mathf.Max(0.0001f, ridgeStrength);
+        mountainCurve = Mathf.Max(0.0001f, mountainCurve);
+
+        if (!Application.isPlaying)
+        {
+            GenerateWorld();
+        }
     }
 
     [ContextMenu("Generate World")]
@@ -50,18 +64,31 @@ public class VoxelWorld : MonoBehaviour
             }
         }
 
-
         int worldMaxHeight = chunksY * chunkSize;
+        int worldWidth = chunksX * chunkSize;
+        int worldLength = chunksZ * chunkSize;
 
-        for (int x = 0; x < chunksX * chunkSize; x++)
+        float[,] heights = FractalMountainHeightGenerator.GenerateHeightMatrix(
+            worldWidth,
+            worldLength,
+            terrainHeight,
+            worldMaxHeight,
+            baseScale,
+            octaves,
+            persistence,
+            lacunarity,
+            seed,
+            offset,
+            ridgeStrength,
+            mountainCurve
+        );
+
+        for (int x = 0; x < worldWidth; x++)
         {
-            for (int z = 0; z < chunksZ * chunkSize; z++)
+            for (int z = 0; z < worldLength; z++)
             {
-                float sampleX = (x + seed) * noiseScale;
-                float sampleZ = (z + seed) * noiseScale;
-
                 int columnHeight = Mathf.Clamp(
-                    Mathf.FloorToInt(Mathf.PerlinNoise(sampleX, sampleZ) * heightMultiplier) + baseHeight,
+                    Mathf.RoundToInt(heights[x, z]),
                     1,
                     worldMaxHeight
                 );
