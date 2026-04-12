@@ -37,6 +37,7 @@ CSCI-580.slnx
 
 # Visual Studio cache directory
 .vs/
+.idea/
 
 # Gradle cache directory
 .gradle/

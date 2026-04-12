@@ -372,10 +372,15 @@ MonoBehaviour:
   chunksX: 2
   chunksY: 1
   chunksZ: 2
-  noiseScale: 0.15
-  heightMultiplier: 5
-  baseHeight: 2
+  terrainHeight: 8
+  baseScale: 50
+  octaves: 4
+  persistence: 0.35
+  lacunarity: 3
   seed: 0
+  offset: {x: 0, y: 0}
+  ridgeStrength: 1
+  mountainCurve: 1
 --- !u!4 &1995983585
 Transform:
   m_ObjectHideFlags: 0
