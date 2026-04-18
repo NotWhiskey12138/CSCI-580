@@ -395,6 +395,7 @@ GameObject:
   - component: {fileID: 1995983584}
   - component: {fileID: 1995983582}
   - component: {fileID: 1995983586}
+  - component: {fileID: 1995983587}
   m_Layer: 0
   m_Name: VoxelSystem
   m_TagString: Untagged
@@ -471,6 +472,23 @@ MonoBehaviour:
   world: {fileID: 1995983584}
   chunkMaterial: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
   edgeMaterial: {fileID: 2100000, guid: 6b45e3239443dee478e653c778bcf9ec, type: 2}
+--- !u!114 &1995983587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1995983581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e7f33aa9f17b934aaa3b08a27866980, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VoxelLabelDrawer
+  world: {fileID: 1995983584}
+  maxDistance: 20
+  showCoords: 0
+  fontSize: 9
+  color: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

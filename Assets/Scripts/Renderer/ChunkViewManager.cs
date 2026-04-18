@@ -5,6 +5,7 @@ public class ChunkViewManager : MonoBehaviour
 {
     [SerializeField] private VoxelWorld world;
     [SerializeField] private Material chunkMaterial;
+    [SerializeField] private Material edgeMaterial;
 
     private readonly Dictionary<Vector3Int, ChunkRenderer> renderers = new();
 
@@ -23,19 +24,24 @@ public class ChunkViewManager : MonoBehaviour
         {
             Vector3Int coord = pair.Key;
 
+            // 1. 实心 mesh（solid）
             var go = new GameObject($"Chunk_{coord.x}_{coord.y}_{coord.z}");
             go.transform.SetParent(transform, false);
 
-            // RequireComponent 会连带加上 MeshFilter + MeshRenderer
             var cr = go.AddComponent<ChunkRenderer>();
-
             var mr = go.GetComponent<MeshRenderer>();
-            if (chunkMaterial != null)
-            {
-                mr.sharedMaterial = chunkMaterial;
-            }
-
+            if (chunkMaterial != null) mr.sharedMaterial = chunkMaterial;
             cr.Build(world, coord, world.ChunkSize);
+
+            // 2. 线框 mesh（edges）作为子物体，local=0
+            if (edgeMaterial != null)
+            {
+                var edgeGo = new GameObject("Edges");
+                edgeGo.transform.SetParent(go.transform, false); // 继承 parent 的 origin 偏移
+                var er = edgeGo.AddComponent<ChunkEdgeRenderer>();
+                edgeGo.GetComponent<MeshRenderer>().sharedMaterial = edgeMaterial;
+                er.Build(world, coord, world.ChunkSize);
+            }
 
             renderers[coord] = cr;
         }

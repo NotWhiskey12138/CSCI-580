@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class VoxelBootstrap : MonoBehaviour
@@ -8,6 +9,16 @@ public class VoxelBootstrap : MonoBehaviour
     private void Start()
     {
         BuildMinimalWorld();
+    }
+
+    public void Update()
+    {
+        if (Input.GetKey(KeyCode.R))
+        {
+            BuildMinimalWorld();
+            Debug.Log("Press R to clear the world");
+            
+        }
     }
 
     [ContextMenu("Build Minimal World")]

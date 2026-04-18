@@ -14,6 +14,8 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Debug/ChunkEdgeRenderer.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Debug/VoxelLabelDrawer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Renderer/ChunkRenderer.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Renderer/IVoxelSource.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/test.shader" root0="FORCE_HIGHLIGHTING" />
@@ -107,7 +109,7 @@
       <option name="presentableId" value="Default" />
       <updated>1775867744548</updated>
       <workItem from="1775867745953" duration="3915000" />
-      <workItem from="1776482122787" duration="1334000" />
+      <workItem from="1776482122787" duration="3902000" />
     </task>
     <servers />
   </component>
