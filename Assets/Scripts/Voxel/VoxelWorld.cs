@@ -116,6 +116,42 @@ public class VoxelWorld : MonoBehaviour, IVoxelSource
         }
     }
 
+    public void updateChunk(Vector3Int voxelCoord, int radius)
+    {
+        GetIntegerCoordsInSphere(voxelCoord, radius).ForEach(coord =>
+        {   
+            SetVoxel(coord.x, coord.y, coord.z, VoxelType.Air);
+        });
+        
+    }
+
+    public static List<Vector3Int> GetIntegerCoordsInSphere(Vector3Int center, int radius)
+    {
+        List<Vector3Int> result = new();
+        int radiusSquared = radius * radius;
+
+        for (int x = center.x - radius; x <= center.x + radius; x++)
+        {
+            for (int y = center.y - radius; y <= center.y + radius; y++)
+            {
+                for (int z = center.z - radius; z <= center.z + radius; z++)
+                {
+                    int dx = x - center.x;
+                    int dy = y - center.y;
+                    int dz = z - center.z;
+
+                    if (dx * dx + dy * dy + dz * dz <= radiusSquared)
+                    {
+                        result.Add(new Vector3Int(x, y, z));
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+
     public VoxelType GetVoxel(int worldX, int worldY, int worldZ)
     {
         if (!TryGetChunkAndLocal(worldX, worldY, worldZ, out ChunkData chunk, out Vector3Int localPos))

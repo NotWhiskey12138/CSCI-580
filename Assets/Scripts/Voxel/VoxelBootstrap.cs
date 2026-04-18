@@ -15,9 +15,8 @@ public class VoxelBootstrap : MonoBehaviour
     {
         if (Input.GetKey(KeyCode.R))
         {
-            BuildMinimalWorld();
-            Debug.Log("Press R to clear the world");
-            
+            world.updateChunk(new Vector3Int(0, 10, 0), 10);
+            viewManager.Rebuild();
         }
     }
 
