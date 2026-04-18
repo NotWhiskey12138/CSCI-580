@@ -47,6 +47,49 @@ public class ChunkViewManager : MonoBehaviour
         }
     }
 
+    public void RebuildChunks(List<Vector3Int> coords)
+    {
+        foreach (var coord in coords)
+        {
+            if (!renderers.TryGetValue(coord, out var cr))
+            {
+                var go = new GameObject($"Chunk_{coord.x}_{coord.y}_{coord.z}");
+                go.transform.SetParent(transform, false);
+
+                cr = go.AddComponent<ChunkRenderer>();
+                var mr = go.GetComponent<MeshRenderer>();
+                if (chunkMaterial != null) mr.sharedMaterial = chunkMaterial;
+
+                if (edgeMaterial != null)
+                {
+                    var edgeGo = new GameObject("Edges");
+                    edgeGo.transform.SetParent(go.transform, false);
+                    var er = edgeGo.AddComponent<ChunkEdgeRenderer>();
+                    edgeGo.GetComponent<MeshRenderer>().sharedMaterial = edgeMaterial;
+                    er.Build(world, coord, world.ChunkSize);
+                }
+
+                renderers[coord] = cr;
+            }
+
+            cr.Build(world, coord, world.ChunkSize);
+
+            if (edgeMaterial != null)
+            {
+                var edgeRenderer = cr.GetComponentInChildren<ChunkEdgeRenderer>();
+                if (edgeRenderer == null)
+                {
+                    var edgeGo = new GameObject("Edges");
+                    edgeGo.transform.SetParent(cr.transform, false);
+                    edgeRenderer = edgeGo.AddComponent<ChunkEdgeRenderer>();
+                    edgeGo.GetComponent<MeshRenderer>().sharedMaterial = edgeMaterial;
+                }
+
+                edgeRenderer.Build(world, coord, world.ChunkSize);
+            }
+        }
+    }
+
     [ContextMenu("Clear")]
     public void Clear()
     {

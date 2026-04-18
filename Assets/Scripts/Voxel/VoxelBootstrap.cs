@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class VoxelBootstrap : MonoBehaviour
@@ -24,8 +24,9 @@ public class VoxelBootstrap : MonoBehaviour
         
         if (Input.GetKey(KeyCode.R))
         {
-            world.updateChunk(new Vector3Int(playerPosX,playerPosY,playerPosZ), radius);
-            viewManager.Rebuild();
+            List<Vector3Int> affectedChunks = world.UpdateChunk(new Vector3Int(playerPosX, playerPosY, playerPosZ), radius);
+            viewManager.RebuildChunks(affectedChunks);
+            Debug.Log($"Player at ({playerPosX}, {playerPosY}, {playerPosZ}) destroyed voxels in radius {radius}. Affected chunks: {affectedChunks.Count}");
         }
     }
 

@@ -116,14 +116,26 @@ public class VoxelWorld : MonoBehaviour, IVoxelSource
         }
     }
 
-    public void updateChunk(Vector3Int voxelCoord, int radius)
+   public List<Vector3Int> UpdateChunk(Vector3Int voxelCoord, int radius)
     {
-        GetIntegerCoordsInSphere(voxelCoord, radius).ForEach(coord =>
-        {   
+        HashSet<Vector3Int>affectedChunkCoords = new();
+
+        foreach (Vector3Int coord in GetIntegerCoordsInSphere(voxelCoord, radius))
+        {
+            Vector3Int chunkCoord = WorldToChunkCoord(coord.x, coord.y, coord.z);
+
+            if (!chunks.ContainsKey(chunkCoord))
+            {
+                continue;
+            }
+
             SetVoxel(coord.x, coord.y, coord.z, VoxelType.Air);
-        });
-        
+            affectedChunkCoords.Add(chunkCoord);
+        }
+
+        return new List<Vector3Int>(affectedChunkCoords);
     }
+
 
     public static List<Vector3Int> GetIntegerCoordsInSphere(Vector3Int center, int radius)
     {

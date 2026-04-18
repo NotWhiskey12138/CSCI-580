@@ -289,7 +289,7 @@ CharacterController:
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
-  m_MinMoveDistance: 10
+  m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0.9, z: 0}
 --- !u!1 &1106264134
 GameObject:
@@ -430,11 +430,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf6e0ea338a45154e87f1ba8040200bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VoxelWorld
-  chunkSize: 15
+  chunkSize: 40
   chunksX: 2
   chunksY: 1
   chunksZ: 2
-  terrainHeight: 15
+  terrainHeight: 40
   baseScale: 50
   octaves: 4
   persistence: 0.35
