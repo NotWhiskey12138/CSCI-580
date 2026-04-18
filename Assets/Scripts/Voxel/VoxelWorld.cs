@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class VoxelWorld : MonoBehaviour
+public class VoxelWorld : MonoBehaviour, IVoxelSource
 {
     [Header("Chunk Settings")]
     [SerializeField] private int chunkSize = 8;

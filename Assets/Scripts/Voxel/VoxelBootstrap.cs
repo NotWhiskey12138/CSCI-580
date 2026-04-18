@@ -3,7 +3,7 @@ using UnityEngine;
 public class VoxelBootstrap : MonoBehaviour
 {
     [SerializeField] private VoxelWorld world;
-    [SerializeField] private VoxelWorldDebugView debugView;
+    [SerializeField] private ChunkViewManager viewManager;
 
     private void Start()
     {
@@ -13,13 +13,13 @@ public class VoxelBootstrap : MonoBehaviour
     [ContextMenu("Build Minimal World")]
     public void BuildMinimalWorld()
     {
-        if (world == null || debugView == null)
+        if (world == null || viewManager  == null)
         {
             Debug.LogWarning("VoxelBootstrap: Please assign both World and DebugView.");
             return;
         }
 
         world.GenerateWorld();
-        debugView.Rebuild();
+        viewManager.Rebuild();
     }
 }

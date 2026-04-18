@@ -76,6 +76,9 @@ public class PlayerController : MonoBehaviour
         // vertical movement
         if (Input.GetKey(KeyCode.Space))
             move += Vector3.up;
+        
+        if (Input.GetKey(KeyCode.LeftControl))
+            move -= Vector3.down;
 
         // sprint
         float currentSpeed = Input.GetKey(KeyCode.LeftShift)

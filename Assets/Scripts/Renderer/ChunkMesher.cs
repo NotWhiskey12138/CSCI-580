@@ -3,59 +3,55 @@ using UnityEngine;
 
 public class ChunkMesher
 {
-    public Mesh BuildMesh(IVoxelData data)
+    // origin = chunk 左下角的世界坐标；size = chunk 边长
+    // 返回的 mesh 顶点在 chunk 本地空间（0..size），定位靠 transform.position = origin
+    public Mesh BuildMesh(IVoxelSource source, Vector3Int origin, int size)
     {
         List<Vector3> vertices = new();
         List<int> triangles = new();
         List<Vector2> uvs = new();
 
-        for (int x = 0; x < data.SizeX; x++)
+        for (int x = 0; x < size; x++)
         {
-            for (int y = 0; y < data.SizeY; y++)
+            for (int y = 0; y < size; y++)
             {
-                for (int z = 0; z < data.SizeZ; z++)
+                for (int z = 0; z < size; z++)
                 {
-                    BlockType block = data.GetBlock(x, y, z);
-                    if (block == BlockType.Air) continue;
+                    int wx = origin.x + x;
+                    int wy = origin.y + y;
+                    int wz = origin.z + z;
 
-                    Vector3 pos = new Vector3(x, y, z);
+                    VoxelType block = source.GetVoxel(wx, wy, wz);
+                    if (block == VoxelType.Air) continue;
 
-                    if (IsAir(data, x, y + 1, z)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Up);
-                    if (IsAir(data, x, y - 1, z)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Down);
-                    if (IsAir(data, x - 1, y, z)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Left);
-                    if (IsAir(data, x + 1, y, z)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Right);
-                    if (IsAir(data, x, y, z + 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Forward);
-                    if (IsAir(data, x, y, z - 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Back);
+                    Vector3 pos = new Vector3(x, y, z); // 本地坐标
+
+                    if (IsAir(source, wx, wy + 1, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Up);
+                    if (IsAir(source, wx, wy - 1, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Down);
+                    if (IsAir(source, wx - 1, wy, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Left);
+                    if (IsAir(source, wx + 1, wy, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Right);
+                    if (IsAir(source, wx, wy, wz + 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Forward);
+                    if (IsAir(source, wx, wy, wz - 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Back);
                 }
             }
         }
 
         Mesh mesh = new Mesh();
         mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-        mesh.vertices = vertices.ToArray();
-        mesh.triangles = triangles.ToArray();
-        mesh.uv = uvs.ToArray();
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles, 0);
+        mesh.SetUVs(0, uvs);
         mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
         return mesh;
     }
 
-    private bool IsAir(IVoxelData data, int x, int y, int z)
+    private bool IsAir(IVoxelSource source, int wx, int wy, int wz)
     {
-        if (x < 0 || x >= data.SizeX || y < 0 || y >= data.SizeY || z < 0 || z >= data.SizeZ)
-            return true;
-
-        return data.GetBlock(x, y, z) == BlockType.Air;
+        return source.GetVoxel(wx, wy, wz) == VoxelType.Air;
     }
 
-    private enum FaceDirection
-    {
-        Up,
-        Down,
-        Left,
-        Right,
-        Forward,
-        Back
-    }
+    private enum FaceDirection { Up, Down, Left, Right, Forward, Back }
 
     private void AddFace(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, Vector3 pos, FaceDirection dir)
     {
@@ -69,35 +65,30 @@ public class ChunkMesher
                 vertices.Add(pos + new Vector3(1, 1, 1));
                 vertices.Add(pos + new Vector3(1, 1, 0));
                 break;
-
             case FaceDirection.Down:
                 vertices.Add(pos + new Vector3(0, 0, 0));
                 vertices.Add(pos + new Vector3(1, 0, 0));
                 vertices.Add(pos + new Vector3(1, 0, 1));
                 vertices.Add(pos + new Vector3(0, 0, 1));
                 break;
-
             case FaceDirection.Left:
                 vertices.Add(pos + new Vector3(0, 0, 0));
                 vertices.Add(pos + new Vector3(0, 0, 1));
                 vertices.Add(pos + new Vector3(0, 1, 1));
                 vertices.Add(pos + new Vector3(0, 1, 0));
                 break;
-
             case FaceDirection.Right:
                 vertices.Add(pos + new Vector3(1, 0, 1));
                 vertices.Add(pos + new Vector3(1, 0, 0));
                 vertices.Add(pos + new Vector3(1, 1, 0));
                 vertices.Add(pos + new Vector3(1, 1, 1));
                 break;
-
             case FaceDirection.Forward:
                 vertices.Add(pos + new Vector3(0, 0, 1));
                 vertices.Add(pos + new Vector3(1, 0, 1));
                 vertices.Add(pos + new Vector3(1, 1, 1));
                 vertices.Add(pos + new Vector3(0, 1, 1));
                 break;
-
             case FaceDirection.Back:
                 vertices.Add(pos + new Vector3(1, 0, 0));
                 vertices.Add(pos + new Vector3(0, 0, 0));
