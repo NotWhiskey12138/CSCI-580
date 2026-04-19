@@ -116,9 +116,9 @@ public class VoxelWorld : MonoBehaviour, IVoxelSource
         }
     }
 
-   public List<Vector3Int> UpdateChunk(Vector3Int voxelCoord, int radius)
+    public List<Vector3Int> UpdateChunk(Vector3Int voxelCoord, int radius)
     {
-        HashSet<Vector3Int>affectedChunkCoords = new();
+        HashSet<Vector3Int> affectedChunkCoords = new();
 
         foreach (Vector3Int coord in GetIntegerCoordsInSphere(voxelCoord, radius))
         {
