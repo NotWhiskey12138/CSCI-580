@@ -26,12 +26,12 @@ public class ChunkMesher
 
                     Vector3 pos = new Vector3(x, y, z); // 本地坐标
 
-                    if (IsAir(source, wx, wy + 1, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Up);
-                    if (IsAir(source, wx, wy - 1, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Down);
-                    if (IsAir(source, wx - 1, wy, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Left);
-                    if (IsAir(source, wx + 1, wy, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Right);
-                    if (IsAir(source, wx, wy, wz + 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Forward);
-                    if (IsAir(source, wx, wy, wz - 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Back);
+                    if (y == size - 1 || IsAir(source, wx, wy + 1, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Up);
+                    if (y == 0 || IsAir(source, wx, wy - 1, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Down);
+                    if (x == 0 || IsAir(source, wx - 1, wy, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Left);
+                    if (x == size - 1 || IsAir(source, wx + 1, wy, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Right);
+                    if (z == size - 1 || IsAir(source, wx, wy, wz + 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Forward);
+                    if (z == 0 || IsAir(source, wx, wy, wz - 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Back);
                 }
             }
         }

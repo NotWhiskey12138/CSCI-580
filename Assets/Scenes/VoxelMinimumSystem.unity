@@ -417,7 +417,24 @@ MonoBehaviour:
   world: {fileID: 1995983584}
   viewManager: {fileID: 1995983586}
   player: {fileID: 1026011751}
-  radius: 10
+  cameraTransform: {fileID: 1106264137}
+  explosionDuration: 1.5
+  explosion:
+    growthDuration: 0.9
+    upwardDuration: 1.8
+    dissipationDuration: 0.8
+    sphereCount: 9
+    baseRadius: 5
+    topRadiusBonus: 3
+    horizontalSpread: 1.8
+    verticalSpacing: 1.15
+    upwardSpeed: 2.1
+    driftAmount: 0.9
+    turbulenceStrength: 0.45
+    fireShellThickness: 0.22
+    smokeStartDelay: 0.2
+  explosionRayDistance: 200
+  explosionRayStep: 0.25
 --- !u!114 &1995983584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -432,9 +449,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VoxelWorld
   chunkSize: 16
   chunksX: 10
-  chunksY: 1
+  chunksY: 3
   chunksZ: 10
-  terrainHeight: 16
+  terrainHeight: 48
   baseScale: 50
   octaves: 4
   persistence: 0.35
@@ -474,7 +491,7 @@ MonoBehaviour:
   chunkMaterial: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
   edgeMaterial: {fileID: 2100000, guid: 6b45e3239443dee478e653c778bcf9ec, type: 2}
   player: {fileID: 1026011751}
-  viewDistance: 2
+  viewDistance: 5
   preloadDistance: 4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
