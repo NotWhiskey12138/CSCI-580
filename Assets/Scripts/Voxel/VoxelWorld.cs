@@ -136,6 +136,82 @@ public class VoxelWorld : MonoBehaviour, IVoxelSource
         return new List<Vector3Int>(affectedChunkCoords);
     }
 
+    public List<Vector3Int> ApplyExplosionFrame(Vector3Int center, Explosion explosion, float t)
+    {
+        return ApplyExplosionFrame(explosion.BuildVoxelMap(center, t), null);
+    }
+
+    public List<Vector3Int> ApplyExplosionFrame(
+        Dictionary<Vector3Int, VoxelType> currentVoxels,
+        HashSet<Vector3Int> previousTransientVoxels)
+    {
+        HashSet<Vector3Int> affectedChunkCoords = new();
+        HashSet<Vector3Int> currentTransientVoxels = new();
+
+        foreach (KeyValuePair<Vector3Int, VoxelType> pair in currentVoxels)
+        {
+            Vector3Int coord = pair.Key;
+            VoxelType voxelType = pair.Value;
+            Vector3Int chunkCoord = WorldToChunkCoord(coord.x, coord.y, coord.z);
+
+            if (!chunks.ContainsKey(chunkCoord))
+            {
+                continue;
+            }
+
+            if (GetVoxel(coord.x, coord.y, coord.z) == voxelType)
+            {
+                if (voxelType == VoxelType.Fire || voxelType == VoxelType.Smoke)
+                {
+                    currentTransientVoxels.Add(coord);
+                }
+                continue;
+            }
+
+            SetVoxel(coord.x, coord.y, coord.z, voxelType);
+            affectedChunkCoords.Add(chunkCoord);
+
+            if (voxelType == VoxelType.Fire || voxelType == VoxelType.Smoke)
+            {
+                currentTransientVoxels.Add(coord);
+            }
+        }
+
+        if (previousTransientVoxels != null)
+        {
+            foreach (Vector3Int coord in previousTransientVoxels)
+            {
+                if (currentTransientVoxels.Contains(coord))
+                {
+                    continue;
+                }
+
+                Vector3Int chunkCoord = WorldToChunkCoord(coord.x, coord.y, coord.z);
+                if (!chunks.ContainsKey(chunkCoord))
+                {
+                    continue;
+                }
+
+                VoxelType currentType = GetVoxel(coord.x, coord.y, coord.z);
+                if (currentType != VoxelType.Fire && currentType != VoxelType.Smoke)
+                {
+                    continue;
+                }
+
+                SetVoxel(coord.x, coord.y, coord.z, VoxelType.Air);
+                affectedChunkCoords.Add(chunkCoord);
+            }
+
+            previousTransientVoxels.Clear();
+            foreach (Vector3Int coord in currentTransientVoxels)
+            {
+                previousTransientVoxels.Add(coord);
+            }
+        }
+
+        return new List<Vector3Int>(affectedChunkCoords);
+    }
+
 
     public static List<Vector3Int> GetIntegerCoordsInSphere(Vector3Int center, int radius)
     {
