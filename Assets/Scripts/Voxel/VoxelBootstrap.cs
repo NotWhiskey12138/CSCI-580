@@ -17,6 +17,7 @@ public class VoxelBootstrap : MonoBehaviour
     private int playerPosY;
     private int playerPosZ;
     private Coroutine activeExplosion;
+    private bool isTimeFrozen;
 
     private void Start()
     {
@@ -28,6 +29,11 @@ public class VoxelBootstrap : MonoBehaviour
         playerPosX = (int)player.position.x;
         playerPosY = (int)player.position.y;
         playerPosZ = (int)player.position.z;
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            ToggleTimeFreeze();
+        }
         
         if (Input.GetKeyDown(KeyCode.R) && activeExplosion == null)
         {
@@ -70,6 +76,12 @@ public class VoxelBootstrap : MonoBehaviour
         }
 
         activeExplosion = null;
+    }
+
+    private void ToggleTimeFreeze()
+    {
+        isTimeFrozen = !isTimeFrozen;
+        Time.timeScale = isTimeFrozen ? 0f : 1f;
     }
 
     private bool TryGetExplosionCenter(out Vector3Int center)
@@ -119,5 +131,26 @@ public class VoxelBootstrap : MonoBehaviour
 
         world.GenerateWorld();
         viewManager.Rebuild();
+    }
+
+    private void OnDisable()
+    {
+        RestoreTimeScale();
+    }
+
+    private void OnDestroy()
+    {
+        RestoreTimeScale();
+    }
+
+    private void RestoreTimeScale()
+    {
+        if (!isTimeFrozen)
+        {
+            return;
+        }
+
+        isTimeFrozen = false;
+        Time.timeScale = 1f;
     }
 }
