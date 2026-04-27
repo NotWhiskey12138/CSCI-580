@@ -13,7 +13,7 @@ public class ChunkRenderer : MonoBehaviour
     }
 
     // Build mesh for this chunk and place it at the correct world position
-    public void Build(IVoxelSource source, Vector3Int chunkCoord, int chunkSize)
+    public void Build(IVoxelSource source, Vector3Int chunkCoord, int chunkSize, VoxelTextureAtlas atlas)
     {
         if (meshFilter == null) meshFilter = GetComponent<MeshFilter>();
         if (meshCollider == null) meshCollider = GetComponent<MeshCollider>();
@@ -24,7 +24,7 @@ public class ChunkRenderer : MonoBehaviour
         transform.localPosition = origin;
 
         var mesher = new ChunkMesher();
-        Mesh mesh = mesher.BuildMesh(source, origin, chunkSize);
+        Mesh mesh = mesher.BuildMesh(source, origin, chunkSize, atlas);
         mesh.name = $"ChunkMesh_{chunkCoord.x}_{chunkCoord.y}_{chunkCoord.z}";
 
         // Destroy old mesh to avoid runtime memory leak

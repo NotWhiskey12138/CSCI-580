@@ -10,6 +10,7 @@ public class ChunkViewManager : MonoBehaviour
     [SerializeField] private Transform player;
     [SerializeField] private int viewDistance = 2;     // visible radius (in chunks)
     [SerializeField] private int preloadDistance = 4;  // preload radius (in chunks)
+    [SerializeField] private VoxelTextureAtlas atlas;
 
     private readonly Dictionary<Vector3Int, ChunkRenderer> renderers = new();
     private readonly Queue<ChunkRenderer> pool = new(); // object pool
@@ -59,7 +60,7 @@ public class ChunkViewManager : MonoBehaviour
             if (!renderers.TryGetValue(coord, out var cr) || cr == null)
                 continue;
 
-            cr.Build(world, coord, world.ChunkSize);
+            cr.Build(world, coord, world.ChunkSize, atlas);
 
             if (edgeMaterial != null)
             {
@@ -144,8 +145,8 @@ public class ChunkViewManager : MonoBehaviour
         if (mr != null)
             mr.sharedMaterial = GetChunkMaterial();
 
-        // build mesh
-        cr.Build(world, coord, world.ChunkSize);
+        // build mesh (pass atlas)
+        cr.Build(world, coord, world.ChunkSize, atlas);
 
         // optional edge overlay
         if (edgeMaterial != null)

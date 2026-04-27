@@ -5,7 +5,7 @@ public class ChunkMesher
 {
     // origin = chunk 左下角的世界坐标；size = chunk 边长
     // 返回的 mesh 顶点在 chunk 本地空间（0..size），定位靠 transform.position = origin
-    public Mesh BuildMesh(IVoxelSource source, Vector3Int origin, int size)
+    public Mesh BuildMesh(IVoxelSource source, Vector3Int origin, int size, VoxelTextureAtlas atlas)
     {
         List<Vector3> vertices = new();
         List<int> triangles = new();
@@ -26,12 +26,12 @@ public class ChunkMesher
 
                     Vector3 pos = new Vector3(x, y, z); // 本地坐标
 
-                    if (y == size - 1 || IsAir(source, wx, wy + 1, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Up);
-                    if (y == 0 || IsAir(source, wx, wy - 1, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Down);
-                    if (x == 0 || IsAir(source, wx - 1, wy, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Left);
-                    if (x == size - 1 || IsAir(source, wx + 1, wy, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Right);
-                    if (z == size - 1 || IsAir(source, wx, wy, wz + 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Forward);
-                    if (z == 0 || IsAir(source, wx, wy, wz - 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Back);
+                    if (y == size - 1 || IsAir(source, wx, wy + 1, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Up, block, atlas);
+                    if (y == 0 || IsAir(source, wx, wy - 1, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Down, block, atlas);
+                    if (x == 0 || IsAir(source, wx - 1, wy, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Left, block, atlas);
+                    if (x == size - 1 || IsAir(source, wx + 1, wy, wz)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Right, block, atlas);
+                    if (z == size - 1 || IsAir(source, wx, wy, wz + 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Forward, block, atlas);
+                    if (z == 0 || IsAir(source, wx, wy, wz - 1)) AddFace(vertices, triangles, uvs, pos, FaceDirection.Back, block, atlas);
                 }
             }
         }
@@ -53,7 +53,7 @@ public class ChunkMesher
 
     private enum FaceDirection { Up, Down, Left, Right, Forward, Back }
 
-    private void AddFace(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, Vector3 pos, FaceDirection dir)
+    private void AddFace(List<Vector3> vertices, List<int> triangles, List<Vector2> uvs, Vector3 pos, FaceDirection dir, VoxelType type, VoxelTextureAtlas atlas)
     {
         int start = vertices.Count;
 
@@ -104,9 +104,21 @@ public class ChunkMesher
         triangles.Add(start + 2);
         triangles.Add(start + 3);
 
-        uvs.Add(new Vector2(0, 0));
-        uvs.Add(new Vector2(1, 0));
-        uvs.Add(new Vector2(1, 1));
-        uvs.Add(new Vector2(0, 1));
+        // add UVs from atlas (fallback to default if atlas null)
+        if (atlas != null)
+        {
+            var faceUvs = atlas.GetUVs(type);
+            uvs.Add(faceUvs[0]);
+            uvs.Add(faceUvs[1]);
+            uvs.Add(faceUvs[2]);
+            uvs.Add(faceUvs[3]);
+        }
+        else
+        {
+            uvs.Add(new Vector2(0, 0));
+            uvs.Add(new Vector2(1, 0));
+            uvs.Add(new Vector2(1, 1));
+            uvs.Add(new Vector2(0, 1));
+        }
     }
 }
