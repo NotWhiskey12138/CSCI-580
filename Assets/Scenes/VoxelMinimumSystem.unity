@@ -488,11 +488,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChunkViewManager
   world: {fileID: 1995983584}
-  chunkMaterial: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
-  edgeMaterial: {fileID: 2100000, guid: 6b45e3239443dee478e653c778bcf9ec, type: 2}
+  chunkMaterial: {fileID: 2100000, guid: 34bf6c5d69529cd499c3e88e706f297c, type: 2}
+  edgeMaterial: {fileID: 0}
   player: {fileID: 1026011751}
   viewDistance: 5
   preloadDistance: 4
+  atlas: {fileID: 11400000, guid: 4b3e35a83f670404095af66d2449e0f8, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4297ed54347a52d4185185fe5d0b6860, type: 3}
   m_Name: VoxelTextureAtlas
   m_EditorClassIdentifier: Assembly-CSharp::VoxelTextureAtlas
-  atlasTexture: {fileID: 0}
+  atlasTexture: {fileID: 2800000, guid: dcdf2f4598aa4be4d89de1b59d0262d5, type: 3}
   tilesX: 4
   tilesY: 4
-  tiles: []
+  tiles:
+  - type: 1
+    tileCoord: {x: 0, y: 0}
+  - type: 2
+    tileCoord: {x: 1, y: 0}
+  - type: 3
+    tileCoord: {x: 2, y: 0}
