@@ -5,18 +5,21 @@ public class ChunkRenderer : MonoBehaviour
 {
     private MeshFilter meshFilter;
     private MeshCollider meshCollider;
+    private MeshRenderer meshRenderer;
 
     private void Awake()
     {
         meshFilter = GetComponent<MeshFilter>();
         meshCollider = GetComponent<MeshCollider>();
+        meshRenderer = GetComponent<MeshRenderer>();
     }
 
     // Build mesh for this chunk and place it at the correct world position
-    public void Build(IVoxelSource source, Vector3Int chunkCoord, int chunkSize, VoxelTextureAtlas atlas)
+    public void Build(IVoxelSource source, Vector3Int chunkCoord, int chunkSize, VoxelTextureAtlas atlas, Material opaqueMaterial, Material fireMaterial, Material smokeMaterial)
     {
         if (meshFilter == null) meshFilter = GetComponent<MeshFilter>();
         if (meshCollider == null) meshCollider = GetComponent<MeshCollider>();
+        if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
 
         Vector3Int origin = chunkCoord * chunkSize;
 
@@ -34,9 +37,13 @@ public class ChunkRenderer : MonoBehaviour
         }
 
         meshFilter.sharedMesh = mesh;
+        if (meshRenderer != null)
+        {
+            meshRenderer.sharedMaterials = new[] { opaqueMaterial, fireMaterial, smokeMaterial };
+        }
 
         // Force collider to refresh with new mesh (Unity requires null first)
         meshCollider.sharedMesh = null;
-        meshCollider.sharedMesh = mesh;
+        meshCollider.sharedMesh = null;
     }
 }

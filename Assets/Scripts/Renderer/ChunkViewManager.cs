@@ -5,6 +5,8 @@ public class ChunkViewManager : MonoBehaviour
 {
     [SerializeField] private VoxelWorld world;
     [SerializeField] private Material chunkMaterial;
+    [SerializeField] private Material fireMaterial;
+    [SerializeField] private Material smokeMaterial;
     [SerializeField] private Material edgeMaterial;
 
     [SerializeField] private Transform player;
@@ -17,6 +19,8 @@ public class ChunkViewManager : MonoBehaviour
 
     private Vector3Int lastPlayerChunk = new Vector3Int(int.MinValue, int.MinValue, int.MinValue);
     private Material runtimeFallbackMaterial;
+    private Material runtimeFireMaterial;
+    private Material runtimeSmokeMaterial;
 
     private void Start()
     {
@@ -60,7 +64,7 @@ public class ChunkViewManager : MonoBehaviour
             if (!renderers.TryGetValue(coord, out var cr) || cr == null)
                 continue;
 
-            cr.Build(world, coord, world.ChunkSize, atlas);
+            cr.Build(world, coord, world.ChunkSize, atlas, GetChunkMaterial(), GetFireMaterial(), GetSmokeMaterial());
 
             if (edgeMaterial != null)
             {
@@ -143,10 +147,10 @@ public class ChunkViewManager : MonoBehaviour
         // assign material
         var mr = cr.GetComponent<MeshRenderer>();
         if (mr != null)
-            mr.sharedMaterial = GetChunkMaterial();
+            mr.sharedMaterials = new[] { GetChunkMaterial(), GetFireMaterial(), GetSmokeMaterial() };
 
         // build mesh (pass atlas)
-        cr.Build(world, coord, world.ChunkSize, atlas);
+        cr.Build(world, coord, world.ChunkSize, atlas, GetChunkMaterial(), GetFireMaterial(), GetSmokeMaterial());
 
         // optional edge overlay
         if (edgeMaterial != null)
@@ -218,6 +222,66 @@ public class ChunkViewManager : MonoBehaviour
         return runtimeFallbackMaterial;
     }
 
+    private Material GetSmokeMaterial()
+    {
+        if (smokeMaterial != null)
+            return smokeMaterial;
+
+        if (runtimeSmokeMaterial == null)
+        {
+            Shader shader = Shader.Find("Standard");
+            if (shader != null)
+            {
+                runtimeSmokeMaterial = new Material(shader)
+                {
+                    color = new Color(0.45f, 0.45f, 0.45f, 0.45f)
+                };
+
+                runtimeSmokeMaterial.SetFloat("_Mode", 3f);
+                runtimeSmokeMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                runtimeSmokeMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                runtimeSmokeMaterial.SetInt("_ZWrite", 0);
+                runtimeSmokeMaterial.DisableKeyword("_ALPHATEST_ON");
+                runtimeSmokeMaterial.EnableKeyword("_ALPHABLEND_ON");
+                runtimeSmokeMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                runtimeSmokeMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            }
+        }
+
+        return runtimeSmokeMaterial;
+    }
+
+    private Material GetFireMaterial()
+    {
+        if (fireMaterial != null)
+            return fireMaterial;
+
+        if (runtimeFireMaterial == null)
+        {
+            Shader shader = Shader.Find("Standard");
+            if (shader != null)
+            {
+                runtimeFireMaterial = new Material(shader)
+                {
+                    color = new Color(1f, 0.45f, 0.1f, 0.65f)
+                };
+
+                runtimeFireMaterial.SetFloat("_Mode", 3f);
+                runtimeFireMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                runtimeFireMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                runtimeFireMaterial.SetInt("_ZWrite", 0);
+                runtimeFireMaterial.DisableKeyword("_ALPHATEST_ON");
+                runtimeFireMaterial.EnableKeyword("_ALPHABLEND_ON");
+                runtimeFireMaterial.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                runtimeFireMaterial.EnableKeyword("_EMISSION");
+                runtimeFireMaterial.SetColor("_EmissionColor", new Color(1.2f, 0.35f, 0.05f, 1f));
+                runtimeFireMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            }
+        }
+
+        return runtimeFireMaterial;
+    }
+
     [ContextMenu("Clear")]
     public void Clear()
     {
@@ -257,6 +321,22 @@ public class ChunkViewManager : MonoBehaviour
                 Destroy(runtimeFallbackMaterial);
             else
                 DestroyImmediate(runtimeFallbackMaterial);
+        }
+
+        if (runtimeFireMaterial != null)
+        {
+            if (Application.isPlaying)
+                Destroy(runtimeFireMaterial);
+            else
+                DestroyImmediate(runtimeFireMaterial);
+        }
+
+        if (runtimeSmokeMaterial != null)
+        {
+            if (Application.isPlaying)
+                Destroy(runtimeSmokeMaterial);
+            else
+                DestroyImmediate(runtimeSmokeMaterial);
         }
     }
 }

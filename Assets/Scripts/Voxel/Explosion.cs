@@ -18,7 +18,7 @@ public class Explosion
     [SerializeField] private float upwardSpeed = 2.1f;
     [SerializeField] private float driftAmount = 0.9f;
     [SerializeField] private float turbulenceStrength = 0.45f;
-    [SerializeField] private float fireShellThickness = 0.22f;
+    [SerializeField] private float smokeShellThickness = 0.22f;
     [SerializeField] private float smokeStartDelay = 0.2f;
 
     public float TotalDuration => growthDuration + upwardDuration + dissipationDuration;
@@ -109,7 +109,6 @@ public class Explosion
         Vector3 p = coord + new Vector3(0.5f, 0.5f, 0.5f);
         bool hasSmoke = false;
         bool hasFire = false;
-        bool hasAir = false;
 
         for (int i = 0; i < sphereCount; i++)
         {
@@ -136,43 +135,29 @@ public class Explosion
                 continue;
             }
 
-            if (normalizedDistance <= Mathf.Lerp(0.72f, 0.84f, layer))
-            {
-                hasAir = true;
-                continue;
-            }
-
-            if (t <= growthDuration * 1.15f * dissipation && layer <= 0.45f && normalizedDistance >= 1f - fireShellThickness)
-            {
-                hasFire = true;
-                continue;
-            }
-
-            if (t >= smokeStartDelay && layer >= 0.25f)
+            float smokeShellStart = 1f - Mathf.Clamp(smokeShellThickness, 0.02f, 0.95f);
+            if (t >= smokeStartDelay && normalizedDistance >= smokeShellStart)
             {
                 float smokeNoise = SampleNoise(p, i + 17, t, 0.18f, 91.7f) + 0.5f;
-                if (smokeNoise < 0.2f + dissipation * 0.35f)
+                if (smokeNoise < 0.35f + dissipation * 0.35f)
                 {
                     hasSmoke = true;
+                    continue;
                 }
             }
+
+            hasFire = true;
         }
 
-        if (hasAir)
+        if (hasSmoke)
         {
-            voxelType = VoxelType.Air;
+            voxelType = VoxelType.Smoke;
             return true;
         }
 
         if (hasFire)
         {
             voxelType = VoxelType.Fire;
-            return true;
-        }
-
-        if (hasSmoke)
-        {
-            voxelType = VoxelType.Smoke;
             return true;
         }
 
@@ -224,37 +209,27 @@ public class Explosion
             return false;
         }
 
-        if (normalizedDistance <= Mathf.Lerp(0.72f, 0.84f, layer))
-        {
-            voxelType = VoxelType.Air;
-            return true;
-        }
-
-        if (t <= growthDuration * 1.15f * dissipation && layer <= 0.45f && normalizedDistance >= 1f - fireShellThickness)
-        {
-            voxelType = VoxelType.Fire;
-            return true;
-        }
-
-        if (t >= smokeStartDelay && layer >= 0.25f)
+        float smokeShellStart = 1f - Mathf.Clamp(smokeShellThickness, 0.02f, 0.95f);
+        if (t >= smokeStartDelay && normalizedDistance >= smokeShellStart)
         {
             float smokeNoise = SampleNoise(p, sphereIndex + 17, t, 0.18f, 91.7f) + 0.5f;
-            if (smokeNoise < 0.2f + dissipation * 0.35f)
+            if (smokeNoise < 0.35f + dissipation * 0.35f)
             {
                 voxelType = VoxelType.Smoke;
                 return true;
             }
         }
 
-        return false;
+        voxelType = VoxelType.Fire;
+        return true;
     }
 
     private int GetPriority(VoxelType voxelType)
     {
         return voxelType switch
         {
-            VoxelType.Smoke => 1,
-            VoxelType.Fire => 2,
+            VoxelType.Fire => 1,
+            VoxelType.Smoke => 2,
             VoxelType.Air => 3,
             _ => 0
         };
